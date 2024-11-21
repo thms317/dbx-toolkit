@@ -1,6 +1,6 @@
 [project]
 name = "dbx_toolkit"
-version = "0.1.0"
+version = "1.0.0"
 description = "Toolkit to quickly diagnose and fix Databricks issues."
 authors = [
     { name = "Thomas Brouwer", email = "brouwer.thomas@gmail.com" },
