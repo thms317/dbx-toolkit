@@ -1,0 +1,58 @@
+bundle:
+  name: dbx-toolkit
+
+variables:
+  spark_version:
+    description: Default Spark version to use for jobs
+    default: 15.4.x-scala2.12
+  wheel_path:
+    description: Path of the wheel file
+    default: /Workspace${workspace.root_path}/files/dist/dbx_toolkit-*-py3-none-any.whl
+
+include:
+  - resources/*.yml
+
+artifacts:
+  platform:
+    type: whl
+    path: .
+    build: uv build
+
+sync:
+  include:
+    - dist/dbx_toolkit-*-py3-none-any.whl
+
+targets:
+  # The 'dev' target, for development purposes. This target is the default.
+  dev:
+    # We use 'mode: development' to indicate this is a personal development copy:
+    # - Deployed resources get prefixed with '[dev my_user_name]'
+    # - Any job schedules and triggers are paused by default
+    # - The 'development' mode is used for Delta Live Tables pipelines
+    mode: development
+    default: true
+    # Best practice is to use the host mapping with configured profiles in your .databrickscfg file
+    # workspace:
+    #   host: https://<id>.azuredatabricks.net
+
+  ## Optionally, there could be a 'staging' target here.
+  ## (See Databricks docs on CI/CD at https://docs.databricks.com/dev-tools/bundles/ci-cd.html.)
+  #
+  # staging:
+  #   workspace:
+  #     host: https://<id>.azuredatabricks.net
+
+  # The 'prod' target, used for production deployment.
+  prod:
+    # We use 'mode: production' to indicate this is a production deployment.
+    # Doing so enables strict verification of the settings below.
+    mode: production
+    workspace:
+      host: https://<id>.azuredatabricks.net
+      # We always use /Users/brouwer.thomas@gmail.com for all resources to make sure we only have a single copy.
+      # If this path results in an error, please make sure you have a recent version of the CLI installed.
+      root_path: /Users/brouwer.thomas@gmail.com/.bundle/${bundle.name}/${bundle.target}
+    run_as:
+      # This runs as brouwer.thomas@gmail.com in production. We could also use a service principal here,
+      # see https://docs.databricks.com/dev-tools/bundles/permissions.html.
+      user_name: brouwer.thomas@gmail.com

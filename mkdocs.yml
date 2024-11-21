@@ -1,0 +1,21 @@
+site_name: dbx-toolkit
+
+nav:
+  - Introduction: index.md
+  - Getting Started: getting_started.md
+  - Bundle Deployment: bundle_deployment.md
+  - List of Commands: commands.md
+  - CI/CD: cicd.md
+  - Resources:
+      - Jobs: jobs/index.md
+      - Notebooks: notebooks/index.md
+      - Package: dbx_toolkit.md
+  - Tests:
+      - Tests: tests/tests.md
+      - Test Coverage: tests/coverage_report.md
+      - Test Configuration: tests/test_configuration.md
+  - Release: release.md
+  - Coding Standards: coding_standards.md
+
+theme:
+  name: material
