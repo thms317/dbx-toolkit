@@ -75,6 +75,10 @@ unfixable = [
     "D100",     # "Missing docstring in public module." Not needed for Databricks notebooks.
     "INP001",   # "Part of an implicit namespace package. Add an `__init__.py`." Not needed for Databricks notebooks.
 ]
+"fixtures/**/*.py" = [
+    "D100",     # "Missing docstring in public module." Not needed for Databricks notebooks.
+    "INP001",   # "Part of an implicit namespace package. Add an `__init__.py`." Not needed for Databricks notebooks.
+]
 "tests/*.py" = [
     "PLR2004",  # "Magic value used in comparison, consider replacing with a constant variable." This is fine for tests.
 ]
