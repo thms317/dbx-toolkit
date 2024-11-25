@@ -17,6 +17,26 @@ from pyspark.sql import Column
 # COMMAND ----------
 
 
+def ingest_historic_table(schema_name: str, table_inc_name: str) -> None:
+    """Ingest historic table from the hive_metastore."""
+    # Create a target table for the historic table and the auto-loader stream
+    # dlt.create_streaming_table(
+    #     name=table_inc_name,
+    #     spark_conf={"pipelines.trigger.interval": "60 seconds"},
+    #     table_properties={"quality": "bronze"},
+    # )
+
+    # Create a flow to ingest the historic table from the hive_metastore
+    @dlt.append_flow(
+        name=f"hive_metastore_{table_inc_name}",
+        target=table_inc_name,
+        # once=True,  # best practice, but it crashes in current configuration
+    )
+    def hive_metastore_inc_table() -> dlt.DataFrame:
+        """hive_metastore table."""
+        return spark.readStream.table(f"hive_metastore.{schema_name}.{table_inc_name}")
+
+
 def ingest_scd1_table(
     schema_name: str,
     table_name: str,
