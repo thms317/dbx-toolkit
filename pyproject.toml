@@ -40,7 +40,7 @@ src = ["src"]
 target-version = "py311"
 line-length = 100
 extend-include = ["*.ipynb"]
-exclude = ["scratch"]
+extend-exclude = ["scratch"]
 
 [tool.ruff.lint]
 pydocstyle.convention = "numpy"
