@@ -1,0 +1,98 @@
+# This file was automatically generated using the deploy module.
+
+defaults: &default_task_config
+  run_if: ALL_SUCCESS
+  libraries:
+    - whl: ../../dist/*.whl
+  timeout_seconds: 0
+
+resources:
+  jobs:
+    {{job_name}}:
+      name: {{job_name}}
+
+      tasks:
+        - task_key: dlt_ingestion
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.dlt_{{job_name}}.id}
+
+        - task_key: init-staging
+          <<: *default_task_config
+          depends_on:
+            - task_key: dlt_ingestion
+          notebook_task:
+            notebook_path: ../notebooks/dlt/dlt_init_staging.ipynb
+          job_cluster_key: job_cluster
+
+        - task_key: staging
+          <<: *default_task_config
+          depends_on:
+            - task_key: init-staging
+          notebook_task:
+            notebook_path: ../notebooks/dlt/dlt_staging_sql.ipynb
+          job_cluster_key: job_cluster
+
+      max_concurrent_runs: 1
+
+      parameters:
+        - name: table_name
+          default: {{dataobject_name}}
+        - name: load_date
+          default: "{% raw %}{{job.start_time.iso_datetime}}{% endraw %}"
+        - name: metadata_root
+          default: "${var.metadata_root}"
+        - name: landing_zone
+          default: "${var.landing_zone}"
+        - name: gdp
+          default: "${var.gdp}"
+
+      email_notifications:
+        on_failure:
+          # - {{user_email}}
+
+      schedule:
+        # Run every day at 8:37 AM
+        quartz_cron_expression: "44 37 8 * * ?"
+        timezone_id: Europe/Amsterdam
+
+      job_clusters:
+        - job_cluster_key: job_cluster
+          new_cluster:
+            spark_version: "${var.spark_version}"
+            instance_pool_id: ${var.{{cluster_size}}_worker_pool}
+            driver_instance_pool_id: ${var.{{cluster_size}}_driver_pool}
+            num_workers: {{num_workers}}
+            spark_conf:
+              spark.databricks.delta.optimizeWrite.enabled: "true"
+
+  pipelines:
+    dlt_{{job_name}}:
+      name: dlt_{{job_name}}
+      catalog: uc_ifpoc
+      target: "dlt"
+      libraries:
+        - notebook:
+            path: ../notebooks/dlt/dlt_landing.ipynb
+        - notebook:
+            path: ../notebooks/dlt/dlt_prestaging.ipynb
+
+      clusters:
+        - label: default
+          num_workers: 1
+          node_type_id: {{dlt_node_type_id}}
+
+
+      configuration:
+        bundle.sourcePath: /Workspace/${workspace.file_path}
+        table_name: {{dataobject_name}}
+        metadata_root: "${var.metadata_root}"
+        landing_zone: "${var.landing_zone}"
+        bundle.env: ${bundle.environment}
+        pipelines.allowCustomSchemaForSql: "true"
+        pipelines.allowCustomSchemaForPython: "true"
+
+      continuous: false
+      photon: {{photon}}
+      development: true
+
+      channel: PREVIEW
