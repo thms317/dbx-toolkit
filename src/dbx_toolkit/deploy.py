@@ -1,4 +1,4 @@
-"""Deploy module for jobs and pipelines.
+"""Deploy module for ....
 
 This module automates the generation of ... files for ...
 based on a CSV input file using Jinja2 templates. It reads data from a CSV file, uses
@@ -28,11 +28,11 @@ from pathlib import Path
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader
 
-template_dir = Path("./deploy")
-output_dir = Path("./output")
+template_dir = Path("fixtures")
+output_dir = Path("fixtures/output")
 
 # Load data from CSV
-df_jobs = pd.read_csv(template_dir / "jobs.csv")
+df_target = pd.read_csv(template_dir / "notebooks.csv")
 
 # Setting up the Jinja2 environment
 jinja_env = Environment(
@@ -43,7 +43,7 @@ jinja_env = Environment(
 template = jinja_env.get_template(str(template_dir / "notebook_template.py.jinja"))
 
 # Iterate jobs
-for _, row in df_jobs.iterrows():
+for _, row in df_target.iterrows():
     print("Building notebook:", row["table_name"])
 
     # Rendering the pipeline template
