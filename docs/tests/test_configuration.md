@@ -10,7 +10,7 @@
 To run (unit and/or integration) tests locally (including coverage), run the following command:
 
 ```bash
-poetry run pytest -v tests (--cov=src)
+uv run pytest -v tests (--cov=src)
 ```
 
 For a full test suite, including pre-commit checks, dependency updates, package building, and test coverage reporting, run the following command:

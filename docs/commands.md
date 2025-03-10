@@ -9,6 +9,7 @@ This command verifies the presence of necessary tools and installs them if they 
 - `git`
 - `Poetry`
 - `pyenv`
+- `UV`
 
 The command also sets up the required Python version (specified in the `.python-version` file) using `pyenv` and, if needed, updates the shell configuration files (`.zprofile` and `.zshrc`) for `pyenv` compatibility.
 
@@ -26,6 +27,7 @@ Databricks CLI is already installed. Skipping.
 git is already installed. Skipping.
 poetry is already installed. Skipping.
 pyenv is already installed. Skipping.
+uv is already installed. Skipping.
 Setting up Python version 3.11.0
 Pyenv configuration already exists in .zshrc. Skipping.
 Pyenv configuration already exists in .zprofile. Skipping.
@@ -37,7 +39,7 @@ All tools installed successfully.
 
 ## `setup`
 
-This command sets up the project development environment by configuring `Poetry`, initializing `git` (if required), and installing `pre-commit` hooks.
+This command sets up the project development environment by configuring `UV`, initializing `git` (if required), and installing `pre-commit` hooks.
 
 <details>
   <summary>Usage</summary>
@@ -205,7 +207,7 @@ Package operations: 93 installs, 1 update, 0 removals
 Writing lock file
 
 Installing the current project: dbx-toolkit (0.1.0)
-poetry types update;
+uv sync;
 Updating dependencies
 Resolving dependencies... (1.5s)
 
@@ -232,7 +234,7 @@ make clean
 
 ```bash
 Cleaning up...
-rm -rf .venv poetry.lock
+rm -rf .venv uv.lock
 find . -type d \( -name ".pytest_cache" -o -name ".mypy_cache" -o -name ".ruff_cache" \) -exec rm -rf {} +
 Cleanup completed. Resetting terminal...
 ```
@@ -241,7 +243,7 @@ Cleanup completed. Resetting terminal...
 
 ## `test`
 
-This command first updates Poetry dependencies and builds the package. Then, it runs a full test suite using `pytest`, generating a coverage report, for all the source code.
+This command first updates UV dependencies and builds the package. Then, it runs a full test suite using `pytest`, generating a coverage report, for all the source code.
 
 <details>
   <summary>Usage</summary>
@@ -252,7 +254,7 @@ make test
 
 ```bash
 Running tests...
-poetry run pytest tests --cov=src --cov-report term
+uv run pytest tests --cov=src --cov-report term
 
 ====================== test session starts ======================
 
@@ -291,7 +293,7 @@ make deploy_prd
 ```
 
 ```bash
-poetry build
+uv build
 Building dbx-toolkit (0.1.0)
   - Building sdist
   - Built dbx-toolkit-0.1.0.tar.gz
