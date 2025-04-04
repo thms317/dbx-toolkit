@@ -1,6 +1,9 @@
 #!/bin/bash
 
 # Get Databricks workspace credentials using Azure Resource Graph
+# Make script executable and run script:
+# chmod +x scripts/get-databricks-creds.sh && ./scripts/get-databricks-creds.sh
+
 
 # Login to Azure
 echo "Checking Azure authentication..."
@@ -50,9 +53,10 @@ if [ "$EXPORT_ALL" = true ]; then
         subscription_id: .subscriptionId,
         resource_group: .resourceGroup,
         workspace_name: .name,
-        workspace_id: .id,
+        azure_resource_id: .id,
         workspace_url: .workspaceUrl,
-        tenant_id: $tenantId
+        tenant_id: $tenantId,
+        workspace_id: (.workspaceUrl | capture("adb-(?<id>[0-9]+)").id)
     }]')
     
     # Output to file
@@ -92,8 +96,10 @@ fi
 SUBSCRIPTION_ID=$(echo $WORKSPACE | jq -r '.subscriptionId')
 RESOURCE_GROUP=$(echo $WORKSPACE | jq -r '.resourceGroup')
 WORKSPACE_NAME=$(echo $WORKSPACE | jq -r '.name')
-WORKSPACE_ID=$(echo $WORKSPACE | jq -r '.id')
+AZURE_RESOURCE_ID=$(echo $WORKSPACE | jq -r '.id')
 WORKSPACE_URL=$(echo $WORKSPACE | jq -r '.workspaceUrl')
+# Extract the Databricks workspace ID from the URL (the number after adb- and before the first period)
+WORKSPACE_ID=$(echo "$WORKSPACE_URL" | sed -E 's/adb-([0-9]+)\..*/\1/')
 
 # Check if we should output JSON or text
 if [ -n "$OUTPUT_FILE" ]; then
@@ -102,8 +108,9 @@ if [ -n "$OUTPUT_FILE" ]; then
   \"subscription_id\": \"$SUBSCRIPTION_ID\",
   \"resource_group\": \"$RESOURCE_GROUP\",
   \"workspace_name\": \"$WORKSPACE_NAME\",
-  \"workspace_id\": \"$WORKSPACE_ID\",
+  \"azure_resource_id\": \"$AZURE_RESOURCE_ID\",
   \"workspace_url\": \"$WORKSPACE_URL\",
+  \"workspace_id\": \"$WORKSPACE_ID\",
   \"tenant_id\": \"$TENANT_ID\"
 }" > "$OUTPUT_FILE"
     echo "Exported credentials to $OUTPUT_FILE"
@@ -115,7 +122,8 @@ else
     echo "Public Cloud ID / Subscription ID: $SUBSCRIPTION_ID"
     echo "Account ID: $RESOURCE_GROUP"
     echo "Workspace Name: $WORKSPACE_NAME"
-    echo "Workspace ID: $WORKSPACE_ID"
+    echo "Azure Resource ID: $AZURE_RESOURCE_ID"
     echo "Workspace URL: $WORKSPACE_URL"
+    echo "Workspace ID: $WORKSPACE_ID"
     echo "Tenant ID: $TENANT_ID"
 fi

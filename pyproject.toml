@@ -53,7 +53,6 @@ pydocstyle.convention = "numpy"
 external = ["DOC"]
 select = ["ALL"]
 ignore = [
-    "ANN101",   # "Missing type annotation for `self`." Deprecated.
     "COM812",   # "Missing trailing comma." Ignored since it conflicts with the formatter.
     "D203",     # "One blank line required before class docstring." Should be disabled by default.
     "D213",     # "Multi-line docstring summary should start at the second line." Should be disabled by default.

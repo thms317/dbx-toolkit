@@ -145,6 +145,15 @@ def get_workspace_info() -> dict[str, Any]:
     # output['Account ID'] = b.account_id or "Not Available"
     # Using workspace_id property instead of get_workspace_id method
     output["Workspace ID"] = getattr(client, "workspace_id", "Not Available")
+    output["Workspace URL"] = client.config.host if hasattr(client.config, "host") else "Not Available"
+
+    # Attempt to get workspace name
+    try:
+        workspace_info = client.workspace.get_status(path="/")
+        output["Workspace Name"] = workspace_info.workspace_name if hasattr(workspace_info, "workspace_name") else "Not Available"
+    except (AttributeError, ValueError, ConnectionError):
+        output["Workspace Name"] = "Not Available"
+
     output["Platform"] = (
         client.config.host.split(".")[0] if hasattr(client.config, "host") else "Unknown"
     )
