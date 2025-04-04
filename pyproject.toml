@@ -99,6 +99,9 @@ ignore_missing_imports = true
 testpaths = ["tests"]
 pythonpath = ["src"]
 
+[tool.coverage.run]
+omit = ["*/__init__.py"]
+
 [tool.pydoclint]
 style = "numpy"
 exclude = ".git|.venv|scratch"

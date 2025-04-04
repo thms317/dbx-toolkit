@@ -52,7 +52,7 @@ for _, row in df_target.iterrows():
     )
 
     # Write the output to files, adding a newline at the end of file
-    with Path(output_dir / f'{row["table_name"]}.py').open("w") as f:
+    with Path(output_dir / f"{row['table_name']}.py").open("w") as f:
         f.write(rendered_job + "\n")
 
 print("Notebooks built successfully.")

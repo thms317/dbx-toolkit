@@ -47,7 +47,9 @@ def check_delta_sharing() -> bool:
             return True
         # Method 2: Check via catalog secure kinds
         for catalog in client.catalogs.list():
-            if hasattr(catalog, "securable_kind") and "CATALOG_DELTASHARING" in str(catalog.securable_kind):
+            if hasattr(catalog, "securable_kind") and "CATALOG_DELTASHARING" in str(
+                catalog.securable_kind
+            ):
                 return True
         return False  # noqa: TRY300
     except (AttributeError, ValueError, ConnectionError):
@@ -69,7 +71,11 @@ def count_hive_metastore_objects() -> int:
     """Count the number of Hive Metastore objects."""
     databases = []
     try:
-        catalogs = [c.full_name for c in client.catalogs.list() if c.full_name not in ["__databricks_internal", "system"]]
+        catalogs = [
+            c.full_name
+            for c in client.catalogs.list()
+            if c.full_name not in ["__databricks_internal", "system"]
+        ]
         for c in catalogs:
             if c is not None:
                 schemas_list = list(client.schemas.list(c))
@@ -112,11 +118,15 @@ def check_user_privileges(group_name: str = "admins") -> bool:
         # Get the group members
         admin_group_id = admin_groups[0].id
         # The SDK expects get_members rather than list_members
-        members = list(client.groups.get_members(admin_group_id))  # type: ignore[attr-defined]
+        members = list(client.groups.get_members(admin_group_id))
         if not members:
             return False
         # Check if current user is in the members list
-        return any(member.display == current_user for member in members if hasattr(member, "display") and member.display)
+        return any(
+            member.display == current_user
+            for member in members
+            if hasattr(member, "display") and member.display
+        )
     except (AttributeError, ValueError, ConnectionError):
         return False
 
@@ -145,12 +155,18 @@ def get_workspace_info() -> dict[str, Any]:
     # output['Account ID'] = b.account_id or "Not Available"
     # Using workspace_id property instead of get_workspace_id method
     output["Workspace ID"] = getattr(client, "workspace_id", "Not Available")
-    output["Workspace URL"] = client.config.host if hasattr(client.config, "host") else "Not Available"
+    output["Workspace URL"] = (
+        client.config.host if hasattr(client.config, "host") else "Not Available"
+    )
 
     # Attempt to get workspace name
     try:
         workspace_info = client.workspace.get_status(path="/")
-        output["Workspace Name"] = workspace_info.workspace_name if hasattr(workspace_info, "workspace_name") else "Not Available"
+        output["Workspace Name"] = (
+            workspace_info.workspace_name
+            if hasattr(workspace_info, "workspace_name")
+            else "Not Available"
+        )
     except (AttributeError, ValueError, ConnectionError):
         output["Workspace Name"] = "Not Available"
 

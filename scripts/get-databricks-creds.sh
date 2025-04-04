@@ -58,7 +58,7 @@ if [ "$EXPORT_ALL" = true ]; then
         tenant_id: $tenantId,
         workspace_id: (.workspaceUrl | capture("adb-(?<id>[0-9]+)").id)
     }]')
-    
+
     # Output to file
     echo "$ALL_CREDS" > "$OUTPUT_FILE"
     echo "Exported credentials for all workspaces to $OUTPUT_FILE"
@@ -82,7 +82,7 @@ if [ "$MATCH_COUNT" -gt 1 ]; then
     echo "$MATCHES" | jq -r '.name'
     read -p "Please enter the exact workspace name from the list above: " EXACT_NAME
     WORKSPACE=$(echo "$MATCHES" | jq -c "select(.name == \"$EXACT_NAME\")")
-    
+
     # If no exact match is found
     if [ -z "$WORKSPACE" ]; then
         echo "No exact match found. Please try again."
