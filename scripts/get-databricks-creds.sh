@@ -4,7 +4,6 @@
 # Make script executable and run script:
 # chmod +x scripts/get-databricks-creds.sh && ./scripts/get-databricks-creds.sh
 
-
 # Login to Azure
 echo "Checking Azure authentication..."
 if ! az account show > /dev/null 2>&1; then
@@ -28,6 +27,7 @@ if [ -z "$WORKSPACE_IDENTIFIER" ]; then
     if [ -z "$OUTPUT_FILE" ]; then
         OUTPUT_FILE="$DEFAULT_OUTPUT_FILE"
     fi
+    CSV_FILE="${OUTPUT_FILE%.*}.csv"
 fi
 
 echo "Searching for Databricks workspaces across all subscriptions..."
@@ -51,17 +51,23 @@ if [ "$EXPORT_ALL" = true ]; then
     # Process all workspaces and create a combined JSON
     ALL_CREDS=$(echo $WORKSPACES | jq --arg tenantId "$TENANT_ID" '[.[] | {
         subscription_id: .subscriptionId,
-        resource_group: .resourceGroup,
+        account_id: "",
         workspace_name: .name,
-        azure_resource_id: .id,
-        workspace_url: .workspaceUrl,
+        workspace_id: (.workspaceUrl | capture("adb-(?<id>[0-9]+)").id),
         tenant_id: $tenantId,
-        workspace_id: (.workspaceUrl | capture("adb-(?<id>[0-9]+)").id)
+        resource_group: .resourceGroup,
+        azure_resource_id: .id,
+        workspace_url: .workspaceUrl
     }]')
 
     # Output to file
     echo "$ALL_CREDS" > "$OUTPUT_FILE"
     echo "Exported credentials for all workspaces to $OUTPUT_FILE"
+
+    # Create CSV file with ordered columns
+    echo "subscription_id,account_id,workspace_name,workspace_id,tenant_id" > "$CSV_FILE"
+    echo "$ALL_CREDS" | jq -r '.[] | [.subscription_id, .account_id, .workspace_name, .workspace_id, .tenant_id] | join(",")' >> "$CSV_FILE"
+    echo "Exported CSV for all workspaces to $CSV_FILE"
     exit 0
 fi
 
@@ -106,24 +112,34 @@ if [ -n "$OUTPUT_FILE" ]; then
     # Output as JSON
     echo "{
   \"subscription_id\": \"$SUBSCRIPTION_ID\",
-  \"resource_group\": \"$RESOURCE_GROUP\",
+  \"account_id\": \"\",
   \"workspace_name\": \"$WORKSPACE_NAME\",
-  \"azure_resource_id\": \"$AZURE_RESOURCE_ID\",
-  \"workspace_url\": \"$WORKSPACE_URL\",
   \"workspace_id\": \"$WORKSPACE_ID\",
-  \"tenant_id\": \"$TENANT_ID\"
+  \"tenant_id\": \"$TENANT_ID\",
+  \"resource_group\": \"$RESOURCE_GROUP\",
+  \"azure_resource_id\": \"$AZURE_RESOURCE_ID\",
+  \"workspace_url\": \"$WORKSPACE_URL\"
 }" > "$OUTPUT_FILE"
     echo "Exported credentials to $OUTPUT_FILE"
+
+    # Create CSV file with ordered columns
+    CSV_FILE="${OUTPUT_FILE%.*}.csv"
+    echo "subscription_id,account_id,workspace_name,workspace_id,tenant_id" > "$CSV_FILE"
+    echo "$SUBSCRIPTION_ID,,\"$WORKSPACE_NAME\",$WORKSPACE_ID,$TENANT_ID" >> "$CSV_FILE"
+    echo "Exported CSV credentials to $CSV_FILE"
 else
     # Output as text
     echo "-----------------------------------------"
     echo "DATABRICKS WORKSPACE CREDENTIALS"
     echo "-----------------------------------------"
-    echo "Public Cloud ID / Subscription ID: $SUBSCRIPTION_ID"
-    echo "Account ID: $RESOURCE_GROUP"
+    echo "Subscription ID: $SUBSCRIPTION_ID"
+    echo "Account ID: "
     echo "Workspace Name: $WORKSPACE_NAME"
-    echo "Azure Resource ID: $AZURE_RESOURCE_ID"
-    echo "Workspace URL: $WORKSPACE_URL"
     echo "Workspace ID: $WORKSPACE_ID"
     echo "Tenant ID: $TENANT_ID"
+    echo "-----------------------------------------"
+    echo "Additional Information:"
+    echo "Resource Group: $RESOURCE_GROUP"
+    echo "Azure Resource ID: $AZURE_RESOURCE_ID"
+    echo "Workspace URL: $WORKSPACE_URL"
 fi
