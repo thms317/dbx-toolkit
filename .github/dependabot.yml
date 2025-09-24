@@ -12,6 +12,6 @@ updates:
     directory: .
     schedule:
       interval: weekly
-      groups:
+    groups:
       dev-deps:
         dependency-type: development
