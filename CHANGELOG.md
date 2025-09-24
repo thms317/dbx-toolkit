@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/thms317/dbx-toolkit/compare/v1.1.0...v1.1.1) (2025-09-24)
+
+
+### Bug Fixes
+
+* clean up redundant semantic versioning tools ([65deebc](https://github.com/thms317/dbx-toolkit/commit/65deebcd87f5d70b8550eb9273911e1d268dfabc))
+
 ## [1.1.0] - 2025-09-24
 
 ### 🚀 Features
