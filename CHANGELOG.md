@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/thms317/dbx-toolkit/compare/v1.1.1...v1.1.2) (2025-09-24)
+
+
+### Bug Fixes
+
+* enhance get-databricks-creds.sh script with pagination ([7725b22](https://github.com/thms317/dbx-toolkit/commit/7725b2233cbcc1e0ec115169b2bbb85ed90e5b74))
+
 ## [1.1.1](https://github.com/thms317/dbx-toolkit/compare/v1.1.0...v1.1.1) (2025-09-24)
 
 
