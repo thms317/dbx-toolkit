@@ -43,6 +43,7 @@
 - Update project configuration and tooling
 - Clean up legacy documentation and assets
 - *(release)* 1.1.0 [skip ci]
+
 ## [1.0.0] - 2024-11-21
 
 ### 🚀 Features
