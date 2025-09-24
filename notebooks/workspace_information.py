@@ -117,8 +117,11 @@ def check_user_privileges(group_name: str = "admins") -> bool:
             return False
         # Get the group members
         admin_group_id = admin_groups[0].id
-        # The SDK expects get_members rather than list_members
-        members = list(client.groups.get_members(admin_group_id))
+        if not admin_group_id:
+            return False
+        # Get the full group object which includes members
+        admin_group = client.groups.get(admin_group_id)
+        members = admin_group.members or []
         if not members:
             return False
         # Check if current user is in the members list
