@@ -185,3 +185,6 @@ scratch/**
 
 # UV
 uv.lock
+
+# Claude
+.claude
