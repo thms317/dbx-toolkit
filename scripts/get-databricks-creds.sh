@@ -32,9 +32,38 @@ fi
 
 echo "Searching for Databricks workspaces across all subscriptions..."
 
-# Query all Databricks workspaces across all subscriptions
+# Query all Databricks workspaces across all subscriptions with pagination
 QUERY="Resources | where type =~ 'Microsoft.Databricks/workspaces' | project name, id, location, workspaceUrl=properties.workspaceUrl, subscriptionId, resourceGroup"
-WORKSPACES=$(az graph query -q "$QUERY" --query "data" -o json)
+
+# Get all workspaces with pagination
+ALL_WORKSPACES=""
+SKIP=0
+FIRST=1000  # Max results per page
+
+while true; do
+    PAGE_WORKSPACES=$(az graph query -q "$QUERY" --first $FIRST --skip $SKIP --query "data" -o json)
+    PAGE_COUNT=$(echo "$PAGE_WORKSPACES" | jq length)
+
+    if [ "$PAGE_COUNT" -eq 0 ]; then
+        break
+    fi
+
+    if [ -z "$ALL_WORKSPACES" ]; then
+        ALL_WORKSPACES="$PAGE_WORKSPACES"
+    else
+        # Merge the arrays
+        ALL_WORKSPACES=$(echo "$ALL_WORKSPACES $PAGE_WORKSPACES" | jq -s '.[0] + .[1]')
+    fi
+
+    # If we got fewer results than requested, we're done
+    if [ "$PAGE_COUNT" -lt "$FIRST" ]; then
+        break
+    fi
+
+    SKIP=$((SKIP + FIRST))
+done
+
+WORKSPACES="$ALL_WORKSPACES"
 
 # Check if any workspaces were found
 if [ "$(echo $WORKSPACES | jq length)" -eq 0 ]; then
@@ -53,11 +82,11 @@ if [ "$EXPORT_ALL" = true ]; then
         subscription_id: .subscriptionId,
         account_id: "",
         workspace_name: .name,
-        workspace_id: (.workspaceUrl | capture("adb-(?<id>[0-9]+)").id),
+        workspace_id: (if .workspaceUrl then (.workspaceUrl | capture("adb-(?<id>[0-9]+)").id) else "" end),
         tenant_id: $tenantId,
         resource_group: .resourceGroup,
         azure_resource_id: .id,
-        workspace_url: .workspaceUrl
+        workspace_url: (.workspaceUrl // "")
     }]')
 
     # Output to file
