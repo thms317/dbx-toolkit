@@ -1,0 +1,45 @@
+name: Semantic Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+
+    steps:
+      # Step 1: Checkout the repository and fetch all history and tags
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          ref: 'main'     # Ensure you're on the main branch
+          fetch-depth: 0  # Fetch all history and tags
+
+      # Step 2: Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Step 3: Install Semantic Release
+      - name: Install Semantic Release
+        run: |
+          npm install --no-save \
+            semantic-release \
+            @semantic-release/changelog \
+            @semantic-release/exec \
+            @semantic-release/git \
+            @semantic-release/github
+
+      # Step 4: Run Semantic Release
+      - name: Run Semantic Release
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
