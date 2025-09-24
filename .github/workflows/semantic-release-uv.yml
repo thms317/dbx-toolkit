@@ -18,14 +18,14 @@ jobs:
     steps:
       # Step 1: Checkout the repository and fetch all history and tags
       - name: Checkout the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: 'main'     # Ensure you're on the main branch
           fetch-depth: 0  # Fetch all history and tags
 
       # Step 2: Setup Node.js
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 20
 
