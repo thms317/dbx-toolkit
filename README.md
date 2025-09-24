@@ -9,7 +9,6 @@
 [![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 [![ci](https://github.com/revodatanl/dbx-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/revodatanl/dbx-toolkit/actions/workflows/ci.yml)
 [![semantic-release](https://github.com/revodatanl/dbx-toolkit/actions/workflows/semantic-release.yml/badge.svg)](https://github.com/revodatanl/dbx-toolkit/actions/workflows/semantic-release.yml)
-
 [![tests](docs/assets/badge-tests.svg)](docs/tests/coverage/index.html)
 [![coverage](docs/assets/badge-coverage.svg)](docs/tests/coverage/index.html)
 
