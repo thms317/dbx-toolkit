@@ -42,7 +42,7 @@ def check_delta_sharing() -> bool:
     """
     try:
         # Method 1: Check shares directly
-        shares = list(client.shares.list())
+        shares = list(client.shares.list_shares())
         if len(shares) > 0:
             return True
         # Method 2: Check via catalog secure kinds
